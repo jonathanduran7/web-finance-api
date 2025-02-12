@@ -23,6 +23,7 @@ import { validationSchema } from '../config/validation.config';
         database: configService.get('database.database'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
+        autoLoadEntities: true,
       }),
     }),
   ],
