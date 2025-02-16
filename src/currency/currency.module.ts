@@ -6,7 +6,7 @@ import { CurrencyService } from './currency.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Currency])],
-  exports: [],
+  exports: [CurrencyService],
   providers: [CurrencyService],
   controllers: [CurrencyController],
 })
