@@ -31,4 +31,10 @@ describe('CurrencyService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should return empty currencies ', async () => {
+    currencyRepositoryMock.find.mockReturnValue([]);
+    const result = await service.findAll();
+    expect(result).toEqual([]);
+  });
 });
