@@ -39,4 +39,10 @@ describe('CurrencyController', () => {
     const result = await controller.getBase();
     expect(result).toEqual([]);
   });
+
+  it('should return currencies ', async () => {
+    serviceMock.findAll.mockReturnValue([{ id: 1, name: 'USD' }]);
+    const result = await controller.getBase();
+    expect(result).toEqual([{ id: 1, name: 'USD' }]);
+  });
 });
