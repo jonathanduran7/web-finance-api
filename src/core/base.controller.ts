@@ -20,8 +20,8 @@ export class BaseController<T extends BaseEntity> {
   }
 
   @Put(':id')
-  async putBase(@Param('id') id: string) {
-    return this.service.update(+id, {});
+  async putBase(@Param('id') id: string, @Body() body: any) {
+    this.service.update(+id, body);
   }
 
   @Delete(':id')

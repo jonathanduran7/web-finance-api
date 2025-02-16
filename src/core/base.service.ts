@@ -14,9 +14,11 @@ export class BaseService<T extends BaseEntity> {
   }
 
   update(id, data) {
-    console.log('id', id);
-    console.log('data', data);
-    return { data: 'update' };
+    const result = this.repository.update(id, data);
+    if (!result) {
+      throw new NotFoundException('Data not found');
+    }
+    return result;
   }
 
   delete(id) {
