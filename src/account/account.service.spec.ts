@@ -67,4 +67,12 @@ describe('AccountService', () => {
       expect(e.message).toBe('Data not found');
     }
   });
+
+  it('should create account', async () => {
+    const data = { id: 1, name: 'Account 1', currencyId: 1 };
+    serviceMock.save.mockReturnValue(data);
+    serviceCurrencyMock.findById.mockReturnValue({ id: 1, name: 'USD' });
+    await service.create(data);
+    expect(serviceMock.save).toHaveBeenCalledWith(data);
+  });
 });
