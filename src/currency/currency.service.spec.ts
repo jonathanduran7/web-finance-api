@@ -37,4 +37,10 @@ describe('CurrencyService', () => {
     const result = await service.findAll();
     expect(result).toEqual([]);
   });
+
+  it('should return currencies ', async () => {
+    currencyRepositoryMock.find.mockReturnValue([{ id: 1, name: 'USD' }]);
+    const result = await service.findAll();
+    expect(result).toEqual([{ id: 1, name: 'USD' }]);
+  });
 });
