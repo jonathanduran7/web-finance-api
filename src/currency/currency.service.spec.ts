@@ -1,12 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CurrencyService } from './currency.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Currency } from './currency.entity';
 
 describe('CurrencyService', () => {
   let service: CurrencyService;
 
+  const currencyRepositoryMock = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+    save: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CurrencyService],
+      providers: [
+        CurrencyService,
+        {
+          provide: getRepositoryToken(Currency),
+          useValue: currencyRepositoryMock,
+        },
+      ],
     }).compile();
 
     service = module.get<CurrencyService>(CurrencyService);
