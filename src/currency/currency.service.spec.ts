@@ -6,6 +6,8 @@ import { Currency } from './currency.entity';
 describe('CurrencyService', () => {
   let service: CurrencyService;
 
+  const currencyMock = { id: 1, name: 'USD' };
+
   const currencyRepositoryMock = {
     find: jest.fn(),
     findOne: jest.fn(),
@@ -39,8 +41,14 @@ describe('CurrencyService', () => {
   });
 
   it('should return currencies ', async () => {
-    currencyRepositoryMock.find.mockReturnValue([{ id: 1, name: 'USD' }]);
+    currencyRepositoryMock.find.mockReturnValue([currencyMock]);
     const result = await service.findAll();
-    expect(result).toEqual([{ id: 1, name: 'USD' }]);
+    expect(result).toEqual([currencyMock]);
+  });
+
+  it('should return currency ', async () => {
+    currencyRepositoryMock.findOne.mockReturnValue([currencyMock]);
+    const result = await service.findById(1);
+    expect(result).toEqual([currencyMock]);
   });
 });
