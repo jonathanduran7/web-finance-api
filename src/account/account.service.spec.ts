@@ -96,4 +96,12 @@ describe('AccountService', () => {
       expect(e.message).toBe('Account already exists');
     }
   });
+
+  it('should update account', async () => {
+    const data = { id: 1, name: 'Account 1', currencyId: 1 };
+    serviceMock.findOne.mockReturnValue(data);
+    serviceCurrencyMock.findById.mockReturnValue({ id: 1, name: 'USD' });
+    await service.update(1, data);
+    expect(serviceMock.update).toHaveBeenCalledWith(1, data);
+  });
 });
