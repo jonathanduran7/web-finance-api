@@ -51,4 +51,13 @@ describe('CurrencyService', () => {
     const result = await service.findById(1);
     expect(result).toEqual([currencyMock]);
   });
+
+  it('should show error when currency not found ', async () => {
+    currencyRepositoryMock.findOne.mockReturnValue(null);
+    try {
+      await service.findById(1);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
