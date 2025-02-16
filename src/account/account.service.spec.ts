@@ -52,4 +52,19 @@ describe('AccountService', () => {
     const result = await service.findAll();
     expect(result).toEqual([{ id: 1, name: 'Account 1' }]);
   });
+
+  it('should return account', async () => {
+    serviceMock.findOne.mockReturnValue({ id: 1, name: 'Account 1' });
+    const result = await service.findById(1);
+    expect(result).toEqual({ id: 1, name: 'Account 1' });
+  });
+
+  it('should show error when account not found', async () => {
+    serviceMock.findOne.mockReturnValue(null);
+    try {
+      await service.findById(1);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
