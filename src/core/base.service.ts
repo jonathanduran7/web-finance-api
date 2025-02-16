@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
+export interface BaseEntity {
+  id: number;
+}
+
 @Injectable()
-export class BaseService<T> {
+export class BaseService<T extends BaseEntity> {
   constructor(private readonly repository: Repository<T>) {}
 
   create(data) {
@@ -17,11 +21,16 @@ export class BaseService<T> {
     console.log('id', id);
     return { data: 'delete' };
   }
-  findAll() {
+
+  async findAll() {
     return this.repository.find();
   }
-  findById(id) {
-    console.log('id', id);
-    return { data: 'findById' };
+
+  async findById(id) {
+    const data = await this.repository.findOne({ where: { id } });
+    if (!data) {
+      throw new NotFoundException('Data not found');
+    }
+    return data;
   }
 }
