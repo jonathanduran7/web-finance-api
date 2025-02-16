@@ -86,4 +86,13 @@ describe('CurrencyService', () => {
     await service.delete(1);
     expect(currencyRepositoryMock.delete).toHaveBeenCalledWith({ id: 1 });
   });
+
+  it('should show error when currency not found for delete ', async () => {
+    currencyRepositoryMock.delete.mockReturnValue({ affected: 0 });
+    try {
+      await service.delete(1);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
