@@ -75,4 +75,25 @@ describe('AccountService', () => {
     await service.create(data);
     expect(serviceMock.save).toHaveBeenCalledWith(data);
   });
+
+  it('should show error when currency not found', async () => {
+    const data = { id: 1, name: 'Account 1', currencyId: 1 };
+    serviceCurrencyMock.findById.mockReturnValue(null);
+    try {
+      await service.create(data);
+    } catch (e) {
+      expect(e.message).toBe('Currency not found');
+    }
+  });
+
+  it('should show error when account already exists', async () => {
+    const data = { id: 1, name: 'Account 1', currencyId: 1 };
+    serviceMock.findOne.mockReturnValue(data);
+    serviceCurrencyMock.findById.mockReturnValue({ id: 1, name: 'USD' });
+    try {
+      await service.create(data);
+    } catch (e) {
+      expect(e.message).toBe('Account already exists');
+    }
+  });
 });
