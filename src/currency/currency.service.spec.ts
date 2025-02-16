@@ -60,4 +60,9 @@ describe('CurrencyService', () => {
       expect(e.message).toBe('Data not found');
     }
   });
+
+  it('should create currency ', async () => {
+    await service.create(currencyMock);
+    expect(currencyRepositoryMock.save).toHaveBeenCalledWith(currencyMock);
+  });
 });
