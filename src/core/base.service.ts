@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class BaseService {
+export class BaseService<T> {
+  constructor(private readonly repository: Repository<T>) {}
+
   create(data) {
     return { data: 'create', ...data };
   }
@@ -15,7 +18,7 @@ export class BaseService {
     return { data: 'delete' };
   }
   findAll() {
-    return { data: 'findAll' };
+    return this.repository.find();
   }
   findById(id) {
     console.log('id', id);
