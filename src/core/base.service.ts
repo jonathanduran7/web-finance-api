@@ -13,7 +13,7 @@ export class BaseService<T extends BaseEntity> {
     await this.repository.save(data);
   }
 
-  update(id, data) {
+  async update(id, data) {
     const result = this.repository.update(id, data);
     if (!result) {
       throw new NotFoundException('Data not found');
