@@ -1,9 +1,13 @@
-import { IsNumberString, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class AccountDto {
   @IsString()
   name: string;
 
-  @IsNumberString()
+  @IsNumber()
   currencyId: number;
+
+  @IsNumber()
+  @IsOptional()
+  initialBalance: number;
 }
