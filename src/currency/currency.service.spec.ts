@@ -65,4 +65,19 @@ describe('CurrencyService', () => {
     await service.create(currencyMock);
     expect(currencyRepositoryMock.save).toHaveBeenCalledWith(currencyMock);
   });
+
+  it('should update currency ', async () => {
+    currencyRepositoryMock.update.mockReturnValue({ affected: 1 });
+    await service.update(1, currencyMock);
+    expect(currencyRepositoryMock.update).toHaveBeenCalledWith(1, currencyMock);
+  });
+
+  it('should show error when currency not found for update ', async () => {
+    currencyRepositoryMock.update.mockReturnValue({ affected: 0 });
+    try {
+      await service.update(1, currencyMock);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
