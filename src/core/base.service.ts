@@ -7,7 +7,7 @@ export interface BaseEntity {
 
 @Injectable()
 export class BaseService<T extends BaseEntity> {
-  constructor(private readonly repository: Repository<T>) {}
+  constructor(protected readonly repository: Repository<T>) {}
 
   async create(data) {
     await this.repository.save(data);
