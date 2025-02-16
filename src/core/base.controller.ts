@@ -1,38 +1,31 @@
 import { Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { BaseService } from './base.service';
 
 export class BaseController {
+  constructor(private readonly service: BaseService) {}
+
   @Get()
   async getBase() {
-    return {
-      base: 'USD',
-    };
+    return this.service.findAll();
   }
 
   @Get(':id')
   async getBaseById(@Param('id') id: string) {
-    return {
-      base: 'USD' + id,
-    };
+    return this.service.findById(+id);
   }
 
   @Post()
   async postBase() {
-    return {
-      base: 'USD post',
-    };
+    return this.service.create({});
   }
 
   @Put(':id')
   async putBase(@Param('id') id: string) {
-    return {
-      base: 'USD put' + id,
-    };
+    return this.service.update(+id, {});
   }
 
   @Delete(':id')
   async deleteBase(@Param('id') id: string) {
-    return {
-      base: 'USD delete' + id,
-    };
+    return this.service.delete(+id);
   }
 }
