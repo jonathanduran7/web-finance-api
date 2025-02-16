@@ -65,4 +65,19 @@ describe('CategoryService', () => {
     await service.create(mockCategory);
     expect(mockRepository.save).toHaveBeenCalledWith(mockCategory);
   });
+
+  it('should update category', async () => {
+    mockRepository.update.mockReturnValue({ affected: 1 });
+    await service.update(1, mockCategory);
+    expect(mockRepository.update).toHaveBeenCalledWith(1, mockCategory);
+  });
+
+  it('should show error when category not found', async () => {
+    mockRepository.update.mockReturnValue({ affected: 0 });
+    try {
+      await service.update(1, mockCategory);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
