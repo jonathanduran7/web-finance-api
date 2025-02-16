@@ -8,9 +8,9 @@ describe('AccountService', () => {
   let service: AccountService;
 
   const serviceMock = {
-    findAll: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    save: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
   };
@@ -39,5 +39,17 @@ describe('AccountService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('shour return empty accounts', async () => {
+    serviceMock.find.mockReturnValue([]);
+    const result = await service.findAll();
+    expect(result).toEqual([]);
+  });
+
+  it('should return accounts', async () => {
+    serviceMock.find.mockReturnValue([{ id: 1, name: 'Account 1' }]);
+    const result = await service.findAll();
+    expect(result).toEqual([{ id: 1, name: 'Account 1' }]);
   });
 });
