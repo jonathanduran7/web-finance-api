@@ -80,4 +80,19 @@ describe('CategoryService', () => {
       expect(e.message).toBe('Data not found');
     }
   });
+
+  it('should delete category', async () => {
+    mockRepository.delete.mockReturnValue({ affected: 1 });
+    await service.delete(1);
+    expect(mockRepository.delete).toHaveBeenCalledWith({ id: 1 });
+  });
+
+  it('should show error when category not found', async () => {
+    mockRepository.delete.mockReturnValue({ affected: 0 });
+    try {
+      await service.delete(1);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
