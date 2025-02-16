@@ -51,4 +51,18 @@ describe('CategoryService', () => {
     const result = await service.findById(1);
     expect(result).toEqual(mockCategory);
   });
+
+  it('should show error when category not found', async () => {
+    mockRepository.findOne.mockReturnValue(null);
+    try {
+      await service.findById(1);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
+
+  it('should create category', async () => {
+    await service.create(mockCategory);
+    expect(mockRepository.save).toHaveBeenCalledWith(mockCategory);
+  });
 });
