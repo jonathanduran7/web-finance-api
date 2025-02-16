@@ -104,4 +104,19 @@ describe('AccountService', () => {
     await service.update(1, data);
     expect(serviceMock.update).toHaveBeenCalledWith(1, data);
   });
+
+  it('should delete account', async () => {
+    serviceMock.delete.mockReturnValue({ affected: 1 });
+    await service.delete(1);
+    expect(serviceMock.delete).toHaveBeenCalledWith({ id: 1 });
+  });
+
+  it('should show error when account not found for delete', async () => {
+    serviceMock.delete.mockReturnValue({ affected: 0 });
+    try {
+      await service.delete(1);
+    } catch (e) {
+      expect(e.message).toBe('Data not found');
+    }
+  });
 });
