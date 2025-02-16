@@ -1,8 +1,8 @@
 import { Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseService } from './base.service';
 
-export class BaseController {
-  constructor(private readonly service: BaseService) {}
+export class BaseController<T> {
+  constructor(private readonly service: BaseService<T>) {}
 
   @Get()
   async getBase() {
