@@ -1,8 +1,21 @@
-import { Body, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { BaseEntity, BaseService } from './base.service';
+import { plainToInstance } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
 
-export class BaseController<T extends BaseEntity> {
-  constructor(private readonly service: BaseService<T>) {}
+export class BaseController<T extends BaseEntity, DTOType extends object> {
+  constructor(
+    private readonly service: BaseService<T>,
+    private readonly DTOClass: new () => DTOType,
+  ) {}
 
   @Get()
   async getBase() {
@@ -15,13 +28,25 @@ export class BaseController<T extends BaseEntity> {
   }
 
   @Post()
-  async postBase(@Body() body: any) {
-    this.service.create(body);
+  async postBase(@Body() body: DTOType) {
+    const dto = plainToInstance(this.DTOClass, body);
+    try {
+      await validateOrReject(dto);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+    return this.service.create(dto);
   }
 
   @Put(':id')
-  async putBase(@Param('id') id: string, @Body() body: any) {
-    this.service.update(+id, body);
+  async putBase(@Param('id') id: string, @Body() body: DTOType) {
+    const dto = plainToInstance(this.DTOClass, body);
+    try {
+      await validateOrReject(dto);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+    return this.service.update(+id, body);
   }
 
   @Delete(':id')
