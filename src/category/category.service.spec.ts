@@ -45,4 +45,10 @@ describe('CategoryService', () => {
     const result = await service.findAll();
     expect(result).toEqual([mockCategory]);
   });
+
+  it('should return category', async () => {
+    mockRepository.findOne.mockReturnValue(mockCategory);
+    const result = await service.findById(1);
+    expect(result).toEqual(mockCategory);
+  });
 });
