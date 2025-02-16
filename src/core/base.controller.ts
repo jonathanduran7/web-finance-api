@@ -1,4 +1,4 @@
-import { Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { BaseEntity, BaseService } from './base.service';
 
 export class BaseController<T extends BaseEntity> {
@@ -15,8 +15,8 @@ export class BaseController<T extends BaseEntity> {
   }
 
   @Post()
-  async postBase() {
-    return this.service.create({});
+  async postBase(@Body() body: any) {
+    this.service.create(body);
   }
 
   @Put(':id')

@@ -9,14 +9,16 @@ export interface BaseEntity {
 export class BaseService<T extends BaseEntity> {
   constructor(private readonly repository: Repository<T>) {}
 
-  create(data) {
-    return { data: 'create', ...data };
+  async create(data) {
+    await this.repository.save(data);
   }
+
   update(id, data) {
     console.log('id', id);
     console.log('data', data);
     return { data: 'update' };
   }
+
   delete(id) {
     console.log('id', id);
     return { data: 'delete' };
