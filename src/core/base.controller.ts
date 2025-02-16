@@ -25,7 +25,7 @@ export class BaseController<T extends BaseEntity> {
   }
 
   @Delete(':id')
-  async deleteBase(@Param('id') id: string) {
+  async deleteBase(@Param('id') id: number) {
     return this.service.delete(+id);
   }
 }

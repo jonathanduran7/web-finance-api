@@ -21,9 +21,12 @@ export class BaseService<T extends BaseEntity> {
     return result;
   }
 
-  delete(id) {
-    console.log('id', id);
-    return { data: 'delete' };
+  async delete(id) {
+    const { affected } = await this.repository.delete({ id });
+    if (!affected) {
+      throw new NotFoundException('Data not found');
+    }
+    return;
   }
 
   async findAll() {
