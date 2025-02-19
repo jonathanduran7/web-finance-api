@@ -3,7 +3,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -18,7 +18,7 @@ export class Account {
   @Column()
   initialBalance: number;
 
-  @OneToOne(() => Currency)
+  @ManyToOne(() => Currency)
   @JoinColumn()
   currency: Currency;
 
