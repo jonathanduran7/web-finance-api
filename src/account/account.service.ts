@@ -15,6 +15,13 @@ export class AccountService extends BaseService<Account> {
     super(repository);
   }
 
+  async findAll(): Promise<Account[]> {
+    const accounts = await this.repository.find({
+      relations: ['currency'],
+    });
+    return accounts;
+  }
+
   async create(data: any): Promise<void> {
     const findAccount = await this.repository.findOne({
       where: { name: data?.name },
