@@ -169,4 +169,19 @@ describe('TransactionService', () => {
       expect(error.message).toEqual('Category not found');
     }
   });
+
+  it('should delete transaction', async () => {
+    serviceMock.delete.mockReturnValue({ affected: 1 });
+    await service.delete(1);
+    expect(serviceMock.delete).toBeCalledWith({ id: 1 });
+  });
+
+  it('should show error when transaction not found', async () => {
+    serviceMock.delete.mockReturnValue({ affected: 0 });
+    try {
+      await service.delete(1);
+    } catch (error) {
+      expect(error.message).toEqual('Data not found');
+    }
+  });
 });
