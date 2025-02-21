@@ -71,4 +71,10 @@ describe('TransactionService', () => {
     const result = await service.findAll();
     expect(result).toEqual([transactionMock]);
   });
+
+  it('should return transaction', async () => {
+    serviceMock.findOne.mockReturnValue(transactionMock);
+    const result = await service.findById(1);
+    expect(result).toEqual(transactionMock);
+  });
 });
