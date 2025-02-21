@@ -77,4 +77,13 @@ describe('TransactionService', () => {
     const result = await service.findById(1);
     expect(result).toEqual(transactionMock);
   });
+
+  it('should show error when transaction not found', async () => {
+    serviceMock.findOne.mockReturnValue(null);
+    try {
+      await service.findById(1);
+    } catch (error) {
+      expect(error.message).toEqual('Transaction not found');
+    }
+  });
 });
