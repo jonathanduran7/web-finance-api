@@ -85,4 +85,40 @@ export class TransactionService extends BaseService<Transaction> {
 
     return this.repository.update(id, data);
   }
+
+  async query(
+    page: number = 1,
+    limit: number = 5,
+    order: 'ASC' | 'DESC' = 'ASC',
+    filters?: { [key: string]: any },
+  ) {
+    const queryBuilder = this.repository
+      .createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.account', 'account')
+      .leftJoinAndSelect('transaction.category', 'category');
+
+    if (filters) {
+      Object.keys(filters).forEach((key) => {
+        queryBuilder.andWhere(`transaction.${key} = :${key}`, {
+          [key]: filters[key],
+        });
+      });
+    }
+
+    queryBuilder
+      .orderBy('transaction.createdAt', order)
+      .take(limit)
+      .skip((page - 1) * limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+      previousPage: page > 1 ? page - 1 : null,
+      nextPage: page < Math.ceil(total / limit) ? Number(page) + 1 : null,
+    };
+  }
 }
