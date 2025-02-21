@@ -7,6 +7,16 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('TransactionService', () => {
   let service: TransactionService;
+  const transactionMock: Transaction = {
+    id: 1,
+    title: 'Transaction 1',
+    description: 'Transaction 1 description',
+    amount: 100,
+    account: null,
+    category: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
   const serviceAccountMock = {
     findById: jest.fn(),
@@ -54,5 +64,11 @@ describe('TransactionService', () => {
     serviceMock.find.mockReturnValue([]);
     const result = await service.findAll();
     expect(result).toEqual([]);
+  });
+
+  it('should return transactions', async () => {
+    serviceMock.find.mockReturnValue([transactionMock]);
+    const result = await service.findAll();
+    expect(result).toEqual([transactionMock]);
   });
 });
