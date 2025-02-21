@@ -130,4 +130,43 @@ describe('TransactionService', () => {
       expect(error.message).toEqual('Category not found');
     }
   });
+
+  it('should update transaction', async () => {
+    serviceMock.findOne.mockReturnValue(transactionMock);
+    serviceAccountMock.findById.mockReturnValue(transactionMock.account);
+    serviceCategoryMock.findById.mockReturnValue(transactionMock.category);
+    serviceMock.update.mockReturnValue(transactionMock);
+    await service.update(1, transactionMock);
+    expect(serviceMock.update).toBeCalledWith(1, transactionMock);
+  });
+
+  it('should show error when transaction not found', async () => {
+    serviceMock.findOne.mockReturnValue(null);
+    try {
+      await service.update(1, transactionMock);
+    } catch (error) {
+      expect(error.message).toEqual('Transaction not found');
+    }
+  });
+
+  it('should show error when account not found', async () => {
+    serviceMock.findOne.mockReturnValue(transactionMock);
+    serviceAccountMock.findById.mockReturnValue(null);
+    try {
+      await service.update(1, transactionMock);
+    } catch (error) {
+      expect(error.message).toEqual('Account not found');
+    }
+  });
+
+  it('should show error when category not found', async () => {
+    serviceMock.findOne.mockReturnValue(transactionMock);
+    serviceAccountMock.findById.mockReturnValue(transactionMock.account);
+    serviceCategoryMock.findById.mockReturnValue(null);
+    try {
+      await service.update(1, transactionMock);
+    } catch (error) {
+      expect(error.message).toEqual('Category not found');
+    }
+  });
 });
