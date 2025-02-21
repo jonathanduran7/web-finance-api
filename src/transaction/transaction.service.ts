@@ -35,4 +35,11 @@ export class TransactionService extends BaseService<Transaction> {
 
     await this.repository.save(data);
   }
+
+  async findAll(): Promise<Transaction[]> {
+    const transactions = await this.repository.find({
+      relations: ['account', 'category'],
+    });
+    return transactions;
+  }
 }
