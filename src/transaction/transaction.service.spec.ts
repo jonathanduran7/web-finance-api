@@ -4,16 +4,33 @@ import { Transaction } from './transaction.entity';
 import { AccountService } from 'src/account/account.service';
 import { CategoryService } from 'src/category/category.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Account } from 'src/account/account.entity';
+import { Category } from 'src/category/category.entity';
 
 describe('TransactionService', () => {
   let service: TransactionService;
+
+  const accountMock: Account = {
+    id: 1,
+    name: 'Account 1',
+    initialBalance: 100,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    currency: null,
+  };
+
+  const categoryMock: Category = {
+    id: 1,
+    name: 'Category 1',
+  };
+
   const transactionMock: Transaction = {
     id: 1,
     title: 'Transaction 1',
     description: 'Transaction 1 description',
     amount: 100,
-    account: null,
-    category: null,
+    account: accountMock,
+    category: categoryMock,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -84,6 +101,33 @@ describe('TransactionService', () => {
       await service.findById(1);
     } catch (error) {
       expect(error.message).toEqual('Transaction not found');
+    }
+  });
+
+  it('should create transaction', async () => {
+    serviceAccountMock.findById.mockReturnValue(transactionMock.account);
+    serviceCategoryMock.findById.mockReturnValue(transactionMock.category);
+    serviceMock.save.mockReturnValue(transactionMock);
+    await service.create(transactionMock);
+    expect(serviceMock.save).toBeCalledWith(transactionMock);
+  });
+
+  it('should show error when account not found', async () => {
+    serviceAccountMock.findById.mockReturnValue(null);
+    try {
+      await service.create(transactionMock);
+    } catch (error) {
+      expect(error.message).toEqual('Account not found');
+    }
+  });
+
+  it('should show error when category not found', async () => {
+    serviceAccountMock.findById.mockReturnValue(transactionMock.account);
+    serviceCategoryMock.findById.mockReturnValue(null);
+    try {
+      await service.create(transactionMock);
+    } catch (error) {
+      expect(error.message).toEqual('Category not found');
     }
   });
 });
