@@ -23,7 +23,8 @@ export class TransactionController extends BaseController<
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('order', new ParseEnumPipe(Order)) order?: Order,
+    @Query('search') search?: string,
   ) {
-    return this.transactionService.query(page, limit, order);
+    return this.transactionService.query(page, limit, order, search);
   }
 }

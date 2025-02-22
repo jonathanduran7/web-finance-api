@@ -90,6 +90,7 @@ export class TransactionService extends BaseService<Transaction> {
     page: number = 1,
     limit: number = 5,
     order: 'ASC' | 'DESC' = 'ASC',
+    search?: string,
     filters?: { [key: string]: any },
   ) {
     const queryBuilder = this.repository
@@ -103,6 +104,14 @@ export class TransactionService extends BaseService<Transaction> {
           [key]: filters[key],
         });
       });
+    }
+
+    if (search) {
+      console.log(search);
+      queryBuilder.andWhere(
+        'transaction.description ILIKE :search OR transaction.amount ILIKE :search OR transaction.title ILIKE :search',
+        { search: `%${search}%` },
+      );
     }
 
     queryBuilder
