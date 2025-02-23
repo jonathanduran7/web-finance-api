@@ -24,7 +24,8 @@ export class TransactionController extends BaseController<
     @Query('limit') limit: number,
     @Query('order', new ParseEnumPipe(Order)) order?: Order,
     @Query('search') search?: string,
+    @Query('filters') filters?: Record<string, string>,
   ) {
-    return this.transactionService.query(page, limit, order, search);
+    return this.transactionService.query(page, limit, order, search, filters);
   }
 }
