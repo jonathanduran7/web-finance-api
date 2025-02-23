@@ -107,10 +107,11 @@ export class TransactionService extends BaseService<Transaction> {
     }
 
     if (search) {
-      console.log(search);
       queryBuilder.andWhere(
-        'transaction.description ILIKE :search OR transaction.amount ILIKE :search OR transaction.title ILIKE :search',
-        { search: `%${search}%` },
+        'transaction.title ILIKE :search or transaction.description ILIKE :search',
+        {
+          search: `%${search}%`,
+        },
       );
     }
 
