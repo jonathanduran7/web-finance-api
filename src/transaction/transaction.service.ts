@@ -104,6 +104,8 @@ export class TransactionService extends BaseService<Transaction> {
     order: 'ASC' | 'DESC' = 'ASC',
     search?: string,
     filters?: { [key: string]: any },
+    startDate?: string,
+    endDate?: string,
   ) {
     const queryBuilder = this.repository
       .createQueryBuilder('transaction')
@@ -125,6 +127,24 @@ export class TransactionService extends BaseService<Transaction> {
           search: `%${search}%`,
         },
       );
+    }
+
+    if (startDate && endDate) {
+      queryBuilder.andWhere(
+        'transaction.createdAt BETWEEN :startDate AND :endDate',
+        {
+          startDate,
+          endDate,
+        },
+      );
+    } else if (startDate) {
+      queryBuilder.andWhere('transaction.createdAt >= :startDate', {
+        startDate,
+      });
+    } else if (endDate) {
+      queryBuilder.andWhere('transaction.createdAt <= :endDate', {
+        endDate,
+      });
     }
 
     queryBuilder
