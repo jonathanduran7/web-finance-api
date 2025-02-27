@@ -18,22 +18,28 @@ export class TransactionService extends BaseService<Transaction> {
   }
 
   async create(data: any): Promise<void> {
-    const findAccount = await this.accountService.findById(data.accountId);
+    const [account, category] = await Promise.all([
+      this.accountService.findById(data.accountId),
+      this.categoryService.findById(data.categoryId),
+    ]);
 
-    if (!findAccount) {
+    if (!account) {
       throw new BadRequestException('Account not found');
     }
 
-    const findCategory = await this.categoryService.findById(data.categoryId);
-
-    if (!findCategory) {
+    if (!category) {
       throw new BadRequestException('Category not found');
     }
 
-    data.account = findAccount;
-    data.category = findCategory;
+    const transaction = this.repository.create({
+      ...data,
+      account,
+      category,
+      createdAt: data.date ?? new Date(),
+      updatedAt: data.date ?? new Date(),
+    });
 
-    await this.repository.save(data);
+    await this.repository.save(transaction);
   }
 
   async findAll(): Promise<Transaction[]> {
