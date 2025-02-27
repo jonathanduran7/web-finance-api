@@ -71,25 +71,31 @@ export class TransactionService extends BaseService<Transaction> {
       throw new BadRequestException('Transaction not found');
     }
 
-    const findAccount = await this.accountService.findById(data.accountId);
+    const [account, category] = await Promise.all([
+      this.accountService.findById(data.accountId),
+      this.categoryService.findById(data.categoryId),
+    ]);
 
-    if (!findAccount) {
+    if (!account) {
       throw new BadRequestException('Account not found');
     }
 
-    const findCategory = await this.categoryService.findById(data.categoryId);
-
-    if (!findCategory) {
+    if (!category) {
       throw new BadRequestException('Category not found');
     }
 
-    data.account = findAccount;
-    data.category = findCategory;
+    const updateTransaction = {
+      ...data,
+      account,
+      category,
+      updatedAt: data.date ?? new Date(),
+    };
 
-    delete data.accountId;
-    delete data.categoryId;
+    delete updateTransaction.date;
+    delete updateTransaction.accountId;
+    delete updateTransaction.categoryId;
 
-    return this.repository.update(id, data);
+    return this.repository.update(id, updateTransaction);
   }
 
   async query(
@@ -122,7 +128,7 @@ export class TransactionService extends BaseService<Transaction> {
     }
 
     queryBuilder
-      .orderBy('transaction.createdAt', order)
+      .orderBy('transaction.updatedAt', order)
       .take(limit)
       .skip((page - 1) * limit);
 
