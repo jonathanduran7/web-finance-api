@@ -1,7 +1,11 @@
 import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class TransactionDto {
-  @IsNumber()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
   amount: number;
 
   @IsString()
