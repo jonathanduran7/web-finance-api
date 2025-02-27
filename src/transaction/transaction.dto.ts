@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class TransactionDto {
   @IsNumber()
@@ -16,4 +16,7 @@ export class TransactionDto {
 
   @IsNumber()
   categoryId: number;
+
+  @IsDateString()
+  date: Date;
 }
