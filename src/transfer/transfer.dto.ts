@@ -19,5 +19,6 @@ export class TransferDTO {
   destinationAccountId: number;
 
   @IsDateString()
+  @IsOptional()
   date: Date;
 }
