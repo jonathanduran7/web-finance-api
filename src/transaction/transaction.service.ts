@@ -181,9 +181,9 @@ export class TransactionService extends BaseService<Transaction> {
   async getBalance(startDate: string, endDate: string): Promise<any> {
     const balance = await this.repository
       .createQueryBuilder('transactions')
-      .select('SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS ingresos')
-      .addSelect('SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) AS egresos')
-      .addSelect('SUM(amount) AS neto')
+      .select('SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS income')
+      .addSelect('SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) AS expense')
+      .addSelect('SUM(amount) AS total')
       .where('transactions.updatedAt BETWEEN :startDate AND :endDate', {
         startDate,
         endDate,
