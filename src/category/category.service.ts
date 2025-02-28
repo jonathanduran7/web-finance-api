@@ -16,7 +16,7 @@ export class CategoryService extends BaseService<Category> {
   async getBalance(startDate: string, endDate: string): Promise<any> {
     const balance = await this.repository
       .createQueryBuilder('category')
-      .select('category.name')
+      .select('category.name as category')
       .addSelect('SUM(t.amount)', 'total')
       .leftJoin('category.transactions', 't')
       .where('t.updatedAt BETWEEN :startDate AND :endDate', {
