@@ -81,4 +81,66 @@ export class TransferService extends BaseService<Transfer> {
       updatedAt: new Date(),
     });
   }
+
+  async query(
+    page = 1,
+    limit = 10,
+    order: 'ASC' | 'DESC' = 'ASC',
+    search: string = '',
+    filters: { [key: string]: any } = {},
+    startDate?: string,
+    endDate?: string,
+  ) {
+    const queryBuilder = this.repository
+      .createQueryBuilder('transfer')
+      .leftJoinAndSelect('transfer.sourceAccount', 'sourceAccount')
+      .leftJoinAndSelect('transfer.destinationAccount', 'destinationAccount');
+
+    if (filters) {
+      Object.keys(filters).forEach((key) => {
+        queryBuilder.andWhere(`transfer.${key} = :${key}`, {
+          [key]: filters[key],
+        });
+      });
+    }
+
+    if (search) {
+      queryBuilder.andWhere('transfer.description ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    if (startDate && endDate) {
+      queryBuilder.andWhere(
+        'transfer.updatedAt BETWEEN :startDate AND :endDate',
+        {
+          startDate,
+          endDate,
+        },
+      );
+    } else if (startDate) {
+      queryBuilder.andWhere('transfer.updatedAt >= :startDate', {
+        startDate,
+      });
+    } else if (endDate) {
+      queryBuilder.andWhere('transfer.updatedAt <= :endDate', {
+        endDate,
+      });
+    }
+
+    const [data, total] = await queryBuilder
+      .orderBy('transfer.updatedAt', order)
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+      previousPage: page > 1 ? page - 1 : null,
+      nextPage: page < Math.ceil(total / limit) ? Number(page) + 1 : null,
+    };
+  }
 }
