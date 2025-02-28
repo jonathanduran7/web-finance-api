@@ -71,15 +71,18 @@ export class TransferService extends BaseService<Transfer> {
       );
     }
 
-    delete data.sourceAccountId;
-    delete data.destinationAccountId;
-
-    return this.repository.update(id, {
+    const updateTransfer = {
       ...data,
       sourceAccount,
       destinationAccount,
-      updatedAt: new Date(),
-    });
+      updatedAt: data.date ?? new Date(),
+    };
+
+    delete updateTransfer.date;
+    delete updateTransfer.sourceAccountId;
+    delete updateTransfer.destinationAccountId;
+
+    return this.repository.update(id, updateTransfer);
   }
 
   async query(
