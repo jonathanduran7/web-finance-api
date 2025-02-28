@@ -72,4 +72,17 @@ export class AccountService extends BaseService<Account> {
 
     return this.repository.update(id, { ...data });
   }
+
+  async getBalances() {
+    const balance = await this.repository
+      .createQueryBuilder('accounts')
+      .select('accounts.name as account')
+      .addSelect('COALESCE(SUM(t.amount), 0) AS total')
+      .leftJoin('accounts.transactions', 't')
+      .groupBy('accounts.name')
+      .orderBy('accounts.name', 'ASC')
+      .getRawMany();
+
+    return balance;
+  }
 }
