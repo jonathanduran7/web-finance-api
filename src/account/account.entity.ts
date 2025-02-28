@@ -1,9 +1,11 @@
 import { Currency } from 'src/currency/currency.entity';
+import { Transfer } from 'src/transfer/transfer.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -27,4 +29,10 @@ export class Account {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(() => Transfer, (transfer) => transfer.sourceAccount)
+  sourceTransfers: Transfer[];
+
+  @OneToMany(() => Transfer, (transfer) => transfer.destinationAccount)
+  destinationTransfers: Transfer[];
 }
