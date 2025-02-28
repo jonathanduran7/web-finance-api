@@ -131,18 +131,18 @@ export class TransactionService extends BaseService<Transaction> {
 
     if (startDate && endDate) {
       queryBuilder.andWhere(
-        'transaction.createdAt BETWEEN :startDate AND :endDate',
+        'transaction.updatedAt BETWEEN :startDate AND :endDate',
         {
           startDate,
           endDate,
         },
       );
     } else if (startDate) {
-      queryBuilder.andWhere('transaction.createdAt >= :startDate', {
+      queryBuilder.andWhere('transaction.updatedAt >= :startDate', {
         startDate,
       });
     } else if (endDate) {
-      queryBuilder.andWhere('transaction.createdAt <= :endDate', {
+      queryBuilder.andWhere('transaction.updatedAt <= :endDate', {
         endDate,
       });
     }
