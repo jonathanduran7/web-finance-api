@@ -38,4 +38,12 @@ export class TransactionController extends BaseController<
       endDate,
     );
   }
+
+  @Get('dashboard')
+  dashboard(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.transactionService.dashboard(startDate, endDate);
+  }
 }
