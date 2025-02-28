@@ -163,4 +163,33 @@ export class TransactionService extends BaseService<Transaction> {
       nextPage: page < Math.ceil(total / limit) ? Number(page) + 1 : null,
     };
   }
+
+  async dashboard(startDate?: string, endDate?: string) {
+    const [balance, categories, accounts] = await Promise.all([
+      this.getBalance(startDate, endDate),
+      this.categoryService.getBalance(startDate, endDate),
+      this.accountService.getBalances(),
+    ]);
+
+    return {
+      balance,
+      categories,
+      accounts,
+    };
+  }
+
+  async getBalance(startDate: string, endDate: string): Promise<any> {
+    const balance = await this.repository
+      .createQueryBuilder('transactions')
+      .select('SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS ingresos')
+      .addSelect('SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) AS egresos')
+      .addSelect('SUM(amount) AS neto')
+      .where('transactions.updatedAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .getRawOne();
+
+    return balance;
+  }
 }
