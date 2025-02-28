@@ -1,4 +1,5 @@
 import { Currency } from 'src/currency/currency.entity';
+import { Transaction } from 'src/transaction/transaction.entity';
 import { Transfer } from 'src/transfer/transfer.entity';
 import {
   Column,
@@ -35,4 +36,7 @@ export class Account {
 
   @OneToMany(() => Transfer, (transfer) => transfer.destinationAccount)
   destinationTransfers: Transfer[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.account)
+  transactions: Transaction[];
 }
