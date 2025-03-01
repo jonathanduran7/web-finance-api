@@ -23,6 +23,7 @@ export class CategoryService extends BaseService<Category> {
         startDate,
         endDate,
       })
+      .andWhere('category.id != 9')
       .groupBy('category.name')
       .having('SUM(t.amount) < 0')
       .getRawMany();
