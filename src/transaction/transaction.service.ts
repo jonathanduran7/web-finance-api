@@ -188,6 +188,7 @@ export class TransactionService extends BaseService<Transaction> {
         startDate,
         endDate,
       })
+      .andWhere('transactions.categoryId != 9')
       .getRawOne();
 
     return balance;
