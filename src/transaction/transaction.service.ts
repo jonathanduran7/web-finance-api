@@ -71,6 +71,7 @@ export class TransactionService extends BaseService<Transaction> {
   async update(id: any, data: any) {
     const findTransaction = await this.repository.findOne({
       where: { id },
+      relations: ['account'],
     });
 
     if (!findTransaction) {
@@ -89,6 +90,17 @@ export class TransactionService extends BaseService<Transaction> {
     if (!category) {
       throw new BadRequestException('Category not found');
     }
+
+    if (account.balance + data.amount < 0) {
+      throw new BadRequestException('Insufficient funds');
+    }
+
+    await this.accountService.updateBalance(
+      findTransaction.account.id,
+      -findTransaction.amount,
+    );
+
+    await this.accountService.updateBalance(account.id, data.amount);
 
     const updateTransaction = {
       ...data,
