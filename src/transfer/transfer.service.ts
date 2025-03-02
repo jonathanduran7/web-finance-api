@@ -54,16 +54,17 @@ export class TransferService extends BaseService<Transfer> {
   }
 
   async update(id: any, data: any): Promise<UpdateResult> {
-    const [sourceAccount, destinationAccount, transfer] = await Promise.all([
-      this.accountService.findById(data.sourceAccountId),
-      this.accountService.findById(data.destinationAccountId),
-      this.repository.findOne({
-        where: { id },
-        relations: ['sourceAccount', 'destinationAccount'],
-      }),
-    ]);
+    const [sourceAccount, destinationAccount, existingTransfer] =
+      await Promise.all([
+        this.accountService.findById(data.sourceAccountId),
+        this.accountService.findById(data.destinationAccountId),
+        this.repository.findOne({
+          where: { id },
+          relations: ['sourceAccount', 'destinationAccount'],
+        }),
+      ]);
 
-    if (!transfer) {
+    if (!existingTransfer) {
       throw new BadRequestException('Transfer not found');
     }
 
@@ -86,12 +87,12 @@ export class TransferService extends BaseService<Transfer> {
     }
 
     await this.accountService.updateBalance(
-      transfer.sourceAccount.id,
-      parseFloat(transfer.amount.toString()),
+      existingTransfer.sourceAccount.id,
+      parseFloat(existingTransfer.amount.toString()),
     );
     await this.accountService.updateBalance(
-      transfer.destinationAccount.id,
-      -parseFloat(transfer.amount.toString()),
+      existingTransfer.destinationAccount.id,
+      -parseFloat(existingTransfer.amount.toString()),
     );
 
     await this.accountService.updateBalance(sourceAccount.id, -data.amount);
