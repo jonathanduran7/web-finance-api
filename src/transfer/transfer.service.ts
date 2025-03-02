@@ -175,17 +175,13 @@ export class TransferService extends BaseService<Transfer> {
       throw new BadRequestException('Source or destination account not found');
     }
 
-    const sourceAccountBalance = sourceAccount.balance + transfer.amount;
-    const destinationAccountBalance =
-      destinationAccount.balance - transfer.amount;
-
     await this.accountService.updateBalance(
       sourceAccount.id,
-      sourceAccountBalance,
+      parseFloat(transfer.amount.toString()),
     );
     await this.accountService.updateBalance(
       destinationAccount.id,
-      destinationAccountBalance,
+      -parseFloat(transfer.amount.toString()),
     );
 
     await this.repository.delete(id);
