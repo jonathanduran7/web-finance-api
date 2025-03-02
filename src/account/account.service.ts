@@ -36,7 +36,7 @@ export class AccountService extends BaseService<Account> {
       throw new BadRequestException('Currency not found');
     }
 
-    data.initialBalance = data?.initialBalance || 0;
+    data.balance = data?.balance || 0;
     data.currency = findCurrency;
 
     await this.repository.save(data);
@@ -65,7 +65,7 @@ export class AccountService extends BaseService<Account> {
       throw new BadRequestException('Account already exists');
     }
 
-    data.initialBalance = data?.initialBalance || 0;
+    data.balance = data?.balance || 0;
     data.currency = findCurrency;
 
     delete data.currencyId;
@@ -84,5 +84,23 @@ export class AccountService extends BaseService<Account> {
       .getRawMany();
 
     return balance;
+  }
+
+  async updateBalance(id: any, amount: number) {
+    const account = await this.repository.findOne({
+      where: { id },
+    });
+
+    if (!account) {
+      throw new BadRequestException('Account not found');
+    }
+
+    if (account.balance + amount < 0) {
+      throw new BadRequestException('Insufficient funds');
+    }
+
+    account.balance += amount;
+
+    return this.repository.update(id, { balance: account.balance });
   }
 }
