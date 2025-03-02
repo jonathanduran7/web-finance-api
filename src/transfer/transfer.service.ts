@@ -35,6 +35,22 @@ export class TransferService extends BaseService<Transfer> {
       );
     }
 
+    if (sourceAccount.balance < data.amount) {
+      throw new BadRequestException('Insufficient balance');
+    }
+
+    const sourceAccountBalance = sourceAccount.balance - data.amount;
+    const destinationAccountBalance = destinationAccount.balance + data.amount;
+
+    await this.accountService.updateBalance(
+      sourceAccount.id,
+      sourceAccountBalance,
+    );
+    await this.accountService.updateBalance(
+      destinationAccount.id,
+      destinationAccountBalance,
+    );
+
     const transfer = this.repository.create({
       ...data,
       sourceAccount,
