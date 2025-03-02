@@ -31,6 +31,10 @@ export class TransactionService extends BaseService<Transaction> {
       throw new BadRequestException('Category not found');
     }
 
+    if (account.balance + data.amount < 0) {
+      throw new BadRequestException('Insufficient funds');
+    }
+
     const transaction = this.repository.create({
       ...data,
       account,
@@ -38,6 +42,8 @@ export class TransactionService extends BaseService<Transaction> {
       createdAt: data.date ?? new Date(),
       updatedAt: data.date ?? new Date(),
     });
+
+    await this.accountService.updateBalance(account.id, data.amount);
 
     await this.repository.save(transaction);
   }
@@ -193,5 +199,23 @@ export class TransactionService extends BaseService<Transaction> {
       .getRawOne();
 
     return balance;
+  }
+
+  async delete(id: any): Promise<void> {
+    const transaction = await this.repository.findOne({
+      where: { id },
+      relations: ['account'],
+    });
+
+    if (!transaction) {
+      throw new BadRequestException('Transaction not found');
+    }
+
+    await this.accountService.updateBalance(
+      transaction.account.id,
+      -transaction.amount,
+    );
+
+    await this.repository.delete(id);
   }
 }
