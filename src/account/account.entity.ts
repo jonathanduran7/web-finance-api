@@ -19,7 +19,7 @@ export class Account {
   name: string;
 
   @Column()
-  initialBalance: number;
+  balance: number;
 
   @ManyToOne(() => Currency)
   @JoinColumn()
