@@ -149,6 +149,7 @@ export class TransactionService extends BaseService<Transaction> {
 
     queryBuilder
       .orderBy('transaction.updatedAt', order)
+      .addOrderBy('transaction.id', order)
       .take(limit)
       .skip((page - 1) * limit);
 
