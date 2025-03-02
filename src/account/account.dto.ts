@@ -9,5 +9,5 @@ export class AccountDto {
 
   @IsNumber()
   @IsOptional()
-  initialBalance: number;
+  balance: number;
 }
