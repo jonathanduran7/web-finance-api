@@ -97,7 +97,7 @@ export class AccountService extends BaseService<Account> {
       throw new BadRequestException('Insufficient funds');
     }
 
-    account.balance += amount;
+    account.balance = parseFloat(account.balance.toString()) + amount;
 
     return this.repository.update(id, { balance: account.balance });
   }
