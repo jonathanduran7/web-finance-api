@@ -57,7 +57,10 @@ export class TransferService extends BaseService<Transfer> {
     const [sourceAccount, destinationAccount, transfer] = await Promise.all([
       this.accountService.findById(data.sourceAccountId),
       this.accountService.findById(data.destinationAccountId),
-      this.repository.findOne({ where: { id } }),
+      this.repository.findOne({
+        where: { id },
+        relations: ['sourceAccount', 'destinationAccount'],
+      }),
     ]);
 
     if (!transfer) {
@@ -77,6 +80,22 @@ export class TransferService extends BaseService<Transfer> {
         'Source and destination accounts must be different',
       );
     }
+
+    if (sourceAccount.balance < data.amount) {
+      throw new BadRequestException('Insufficient balance');
+    }
+
+    await this.accountService.updateBalance(
+      transfer.sourceAccount.id,
+      parseFloat(transfer.amount.toString()),
+    );
+    await this.accountService.updateBalance(
+      transfer.destinationAccount.id,
+      -parseFloat(transfer.amount.toString()),
+    );
+
+    await this.accountService.updateBalance(sourceAccount.id, -data.amount);
+    await this.accountService.updateBalance(destinationAccount.id, data.amount);
 
     const updateTransfer = {
       ...data,
