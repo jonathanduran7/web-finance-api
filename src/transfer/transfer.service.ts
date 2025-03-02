@@ -39,17 +39,8 @@ export class TransferService extends BaseService<Transfer> {
       throw new BadRequestException('Insufficient balance');
     }
 
-    const sourceAccountBalance = sourceAccount.balance - data.amount;
-    const destinationAccountBalance = destinationAccount.balance + data.amount;
-
-    await this.accountService.updateBalance(
-      sourceAccount.id,
-      sourceAccountBalance,
-    );
-    await this.accountService.updateBalance(
-      destinationAccount.id,
-      destinationAccountBalance,
-    );
+    await this.accountService.updateBalance(sourceAccount.id, -data.amount);
+    await this.accountService.updateBalance(destinationAccount.id, data.amount);
 
     const transfer = this.repository.create({
       ...data,
@@ -161,5 +152,42 @@ export class TransferService extends BaseService<Transfer> {
       previousPage: page > 1 ? page - 1 : null,
       nextPage: page < Math.ceil(total / limit) ? Number(page) + 1 : null,
     };
+  }
+
+  async delete(id: any): Promise<void> {
+    const transfer = await this.repository.findOne({
+      where: { id },
+      relations: ['sourceAccount', 'destinationAccount'],
+    });
+
+    if (!transfer) {
+      throw new BadRequestException('Transfer not found');
+    }
+
+    const sourceAccount = await this.accountService.findById(
+      transfer.sourceAccount.id,
+    );
+    const destinationAccount = await this.accountService.findById(
+      transfer.destinationAccount.id,
+    );
+
+    if (!sourceAccount || !destinationAccount) {
+      throw new BadRequestException('Source or destination account not found');
+    }
+
+    const sourceAccountBalance = sourceAccount.balance + transfer.amount;
+    const destinationAccountBalance =
+      destinationAccount.balance - transfer.amount;
+
+    await this.accountService.updateBalance(
+      sourceAccount.id,
+      sourceAccountBalance,
+    );
+    await this.accountService.updateBalance(
+      destinationAccount.id,
+      destinationAccountBalance,
+    );
+
+    await this.repository.delete(id);
   }
 }
