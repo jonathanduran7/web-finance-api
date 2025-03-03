@@ -9,6 +9,8 @@ import { TransactionModule } from './transaction/transaction.module';
 import { TransferModule } from './transfer/transfer.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from './commons/guards';
 
 @Module({
   imports: [
@@ -22,6 +24,12 @@ import { UsersModule } from './users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}
