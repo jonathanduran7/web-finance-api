@@ -41,6 +41,10 @@ export class AccountService extends BaseService<Account> {
       throw new BadRequestException('Currency not found');
     }
 
+    if (findCurrency?.user?.id !== userId) {
+      throw new BadRequestException('Currency not found');
+    }
+
     data.balance = data?.balance || 0;
     data.currency = findCurrency;
     data.user = { id: userId };
@@ -60,6 +64,10 @@ export class AccountService extends BaseService<Account> {
     const findCurrency = await this.currencyService.findById(data?.currencyId);
 
     if (!findCurrency) {
+      throw new BadRequestException('Currency not found');
+    }
+
+    if (findCurrency?.user?.id !== userId) {
       throw new BadRequestException('Currency not found');
     }
 
