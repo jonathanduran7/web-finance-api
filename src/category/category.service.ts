@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BaseService } from 'src/core/base.service';
 import { Category } from './category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +15,42 @@ export class CategoryService extends BaseService<Category> {
     repository: Repository<Category>,
   ) {
     super(repository);
+  }
+
+  async create(data: any, userId: number): Promise<void> {
+    const findCategory = await this.repository.findOne({
+      where: { name: data?.name, user: { id: userId } },
+    });
+
+    if (findCategory) {
+      throw new BadRequestException('Category already exists');
+    }
+
+    data.user = { id: userId };
+    await this.repository.save(data);
+  }
+
+  async update(id: any, data: any, userId: number) {
+    const findCategory = await this.repository.findOne({
+      where: { id, user: { id: userId } },
+    });
+
+    if (!findCategory) {
+      throw new BadRequestException('Category not found');
+    }
+
+    return this.repository.update(id, data);
+  }
+
+  async delete(id: any, userId: number) {
+    const { affected } = await this.repository.delete({
+      id,
+      user: { id: userId },
+    });
+    if (!affected) {
+      throw new NotFoundException('Data not found');
+    }
+    return;
   }
 
   async getBalance(startDate: string, endDate: string): Promise<any> {
