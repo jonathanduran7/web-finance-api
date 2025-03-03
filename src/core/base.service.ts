@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
 export interface BaseEntity {
   id: number;
@@ -9,11 +9,13 @@ export interface BaseEntity {
 export class BaseService<T extends BaseEntity> {
   constructor(protected readonly repository: Repository<T>) {}
 
-  async create(data) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async create(data, userId: number) {
     await this.repository.save(data);
   }
 
-  async update(id, data) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async update(id, data, userId: number) {
     const result = this.repository.update(id, data);
     if (!result) {
       throw new NotFoundException('Data not found');
@@ -21,7 +23,8 @@ export class BaseService<T extends BaseEntity> {
     return result;
   }
 
-  async delete(id) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async delete(id, userId: number) {
     const { affected } = await this.repository.delete({ id });
     if (!affected) {
       throw new NotFoundException('Data not found');
@@ -29,8 +32,8 @@ export class BaseService<T extends BaseEntity> {
     return;
   }
 
-  async findAll() {
-    return this.repository.find();
+  async findAll(filter?: FindOptionsWhere<T>) {
+    return this.repository.find({ where: filter });
   }
 
   async findById(id) {
