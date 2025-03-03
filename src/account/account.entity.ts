@@ -1,6 +1,7 @@
 import { Currency } from 'src/currency/currency.entity';
 import { Transaction } from 'src/transaction/transaction.entity';
 import { Transfer } from 'src/transfer/transfer.entity';
+import { User } from 'src/users/user.entity';
 import {
   Column,
   Entity,
@@ -39,4 +40,8 @@ export class Account {
 
   @OneToMany(() => Transaction, (transaction) => transaction.account)
   transactions: Transaction[];
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  user: User;
 }
