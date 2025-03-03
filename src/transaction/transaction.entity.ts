@@ -1,5 +1,6 @@
 import { Account } from 'src/account/account.entity';
 import { Category } from 'src/category/category.entity';
+import { User } from 'src/users/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -37,4 +38,8 @@ export class Transaction {
   @ManyToOne(() => Category)
   @JoinColumn()
   category: Category;
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  user: User;
 }
