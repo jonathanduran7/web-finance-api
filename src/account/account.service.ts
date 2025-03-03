@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BaseService } from 'src/core/base.service';
 import { Account } from './account.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CurrencyService } from 'src/currency/currency.service';
 
@@ -15,16 +19,17 @@ export class AccountService extends BaseService<Account> {
     super(repository);
   }
 
-  async findAll(): Promise<Account[]> {
+  async findAll(filters: FindOptionsWhere<Account>): Promise<Account[]> {
     const accounts = await this.repository.find({
       relations: ['currency'],
+      where: filters,
     });
     return accounts;
   }
 
-  async create(data: any): Promise<void> {
+  async create(data: any, userId: number): Promise<void> {
     const findAccount = await this.repository.findOne({
-      where: { name: data?.name },
+      where: { name: data?.name, user: { id: userId } },
     });
     if (findAccount) {
       throw new BadRequestException('Account already exists');
@@ -38,13 +43,14 @@ export class AccountService extends BaseService<Account> {
 
     data.balance = data?.balance || 0;
     data.currency = findCurrency;
+    data.user = { id: userId };
 
     await this.repository.save(data);
   }
 
-  async update(id: any, data: any) {
+  async update(id: any, data: any, userId: number) {
     const findAccount = await this.repository.findOne({
-      where: { id },
+      where: { id, user: { id: userId } },
     });
 
     if (!findAccount) {
@@ -71,6 +77,17 @@ export class AccountService extends BaseService<Account> {
     delete data.currencyId;
 
     return this.repository.update(id, { ...data });
+  }
+
+  async delete(id: any, userId: number) {
+    const { affected } = await this.repository.delete({
+      id,
+      user: { id: userId },
+    });
+    if (!affected) {
+      throw new NotFoundException('Data not found');
+    }
+    return;
   }
 
   async getBalances() {
