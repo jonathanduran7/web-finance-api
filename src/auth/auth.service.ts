@@ -10,10 +10,15 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<any> {
     const existUser = await this.userService.findByEmail(loginDto.email);
     if (!existUser) {
-      return 'User not found';
-    } else {
-      return 'login';
+      throw new UnauthorizedException();
     }
+
+    const isMatch = await bcrypt.compare(loginDto.password, existUser.password);
+    if (!isMatch) {
+      throw new UnauthorizedException();
+    }
+
+    return 'Login success';
   }
 
   async register(registerDto: RegisterDto) {
