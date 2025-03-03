@@ -98,11 +98,12 @@ export class AccountService extends BaseService<Account> {
     return;
   }
 
-  async getBalances() {
+  async getBalances(userId: number) {
     const balance = await this.repository
       .createQueryBuilder('accounts')
       .select('accounts.name as account')
       .addSelect('accounts.balance as total')
+      .where('accounts.userId = :userId', { userId })
       .orderBy('accounts.name', 'ASC')
       .getRawMany();
 
