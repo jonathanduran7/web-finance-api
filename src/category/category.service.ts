@@ -53,7 +53,11 @@ export class CategoryService extends BaseService<Category> {
     return;
   }
 
-  async getBalance(startDate: string, endDate: string): Promise<any> {
+  async getBalance(
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<any> {
     const balance = await this.repository
       .createQueryBuilder('category')
       .select('category.name as category')
@@ -64,6 +68,7 @@ export class CategoryService extends BaseService<Category> {
         endDate,
       })
       .andWhere('category.id != 9')
+      .andWhere('category.user.id = :userId', { userId })
       .groupBy('category.name')
       .having('SUM(t.amount) < 0')
       .getRawMany();
