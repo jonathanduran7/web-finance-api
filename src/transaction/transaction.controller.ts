@@ -3,6 +3,7 @@ import { BaseController } from 'src/core/base.controller';
 import { TransactionDto } from './transaction.dto';
 import { Transaction } from './transaction.entity';
 import { TransactionService } from './transaction.service';
+import { GetCurrentUserId } from 'src/commons/decorators/get-current-user-id.decorator';
 
 enum Order {
   ASC = 'ASC',
@@ -20,6 +21,7 @@ export class TransactionController extends BaseController<
 
   @Get('query')
   query(
+    @GetCurrentUserId() userId: number,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('order', new ParseEnumPipe(Order)) order?: Order,
@@ -29,6 +31,7 @@ export class TransactionController extends BaseController<
     @Query('endDate') endDate?: string,
   ) {
     return this.transactionService.query(
+      userId,
       page,
       limit,
       order,
@@ -41,9 +44,10 @@ export class TransactionController extends BaseController<
 
   @Get('dashboard')
   dashboard(
+    @GetCurrentUserId() userId: number,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.transactionService.dashboard(startDate, endDate);
+    return this.transactionService.dashboard(userId, startDate, endDate);
   }
 }

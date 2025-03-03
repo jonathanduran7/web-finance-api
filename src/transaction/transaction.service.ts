@@ -5,22 +5,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CategoryService } from 'src/category/category.service';
 import { AccountService } from 'src/account/account.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class TransactionService extends BaseService<Transaction> {
   constructor(
     @InjectRepository(Transaction)
     repository: Repository<Transaction>,
-    private categoryService: CategoryService,
-    private accountService: AccountService,
+    private readonly categoryService: CategoryService,
+    private readonly accountService: AccountService,
+    private readonly userService: UsersService,
   ) {
     super(repository);
   }
 
-  async create(data: any): Promise<void> {
-    const [account, category] = await Promise.all([
+  async create(data: any, userId: number): Promise<void> {
+    const [account, category, user] = await Promise.all([
       this.accountService.findById(data.accountId),
       this.categoryService.findById(data.categoryId),
+      this.userService.findById(userId),
     ]);
 
     if (!account) {
@@ -39,6 +42,7 @@ export class TransactionService extends BaseService<Transaction> {
       ...data,
       account,
       category,
+      user,
       createdAt: data.date ?? new Date(),
       updatedAt: data.date ?? new Date(),
     });
@@ -50,7 +54,7 @@ export class TransactionService extends BaseService<Transaction> {
 
   async findAll(): Promise<Transaction[]> {
     const transactions = await this.repository.find({
-      relations: ['account', 'category'],
+      relations: ['account', 'category', 'users'],
     });
     return transactions;
   }
@@ -58,7 +62,7 @@ export class TransactionService extends BaseService<Transaction> {
   async findById(id: any): Promise<Transaction> {
     const transaction = await this.repository.findOne({
       where: { id },
-      relations: ['account', 'category'],
+      relations: ['account', 'category', 'user'],
     });
 
     if (!transaction) {
@@ -68,9 +72,9 @@ export class TransactionService extends BaseService<Transaction> {
     return transaction;
   }
 
-  async update(id: any, data: any) {
+  async update(id: any, data: any, userId: number) {
     const findTransaction = await this.repository.findOne({
-      where: { id },
+      where: { id, user: { id: userId } },
       relations: ['account'],
     });
 
@@ -117,6 +121,7 @@ export class TransactionService extends BaseService<Transaction> {
   }
 
   async query(
+    userId: number,
     page: number = 1,
     limit: number = 5,
     order: 'ASC' | 'DESC' = 'ASC',
@@ -166,6 +171,7 @@ export class TransactionService extends BaseService<Transaction> {
     }
 
     queryBuilder
+      .andWhere('transaction.userId = :userId', { userId })
       .orderBy('transaction.updatedAt', order)
       .addOrderBy('transaction.id', order)
       .take(limit)
@@ -183,11 +189,11 @@ export class TransactionService extends BaseService<Transaction> {
     };
   }
 
-  async dashboard(startDate?: string, endDate?: string) {
+  async dashboard(userId: number, startDate?: string, endDate?: string) {
     const [balance, categories, accounts] = await Promise.all([
-      this.getBalance(startDate, endDate),
-      this.categoryService.getBalance(startDate, endDate),
-      this.accountService.getBalances(),
+      this.getBalance(userId, startDate, endDate),
+      this.categoryService.getBalance(userId, startDate, endDate),
+      this.accountService.getBalances(userId),
     ]);
 
     return {
@@ -197,7 +203,11 @@ export class TransactionService extends BaseService<Transaction> {
     };
   }
 
-  async getBalance(startDate: string, endDate: string): Promise<any> {
+  async getBalance(
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<any> {
     const balance = await this.repository
       .createQueryBuilder('transactions')
       .select('SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS income')
@@ -208,6 +218,7 @@ export class TransactionService extends BaseService<Transaction> {
         endDate,
       })
       .andWhere('transactions.categoryId != 9')
+      .andWhere('transactions.userId = :userId', { userId })
       .getRawOne();
 
     return balance;
