@@ -4,6 +4,7 @@ import { Transfer } from './transfer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { AccountService } from 'src/account/account.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class TransferService extends BaseService<Transfer> {
@@ -11,14 +12,16 @@ export class TransferService extends BaseService<Transfer> {
     @InjectRepository(Transfer)
     repository: Repository<Transfer>,
     private readonly accountService: AccountService,
+    private readonly userService: UsersService,
   ) {
     super(repository);
   }
 
-  async create(data: any): Promise<void> {
-    const [sourceAccount, destinationAccount] = await Promise.all([
+  async create(data: any, userId: number): Promise<void> {
+    const [sourceAccount, destinationAccount, user] = await Promise.all([
       this.accountService.findById(data.sourceAccountId),
       this.accountService.findById(data.destinationAccountId),
+      this.userService.findById(userId),
     ]);
 
     if (!sourceAccount) {
@@ -46,6 +49,7 @@ export class TransferService extends BaseService<Transfer> {
       ...data,
       sourceAccount,
       destinationAccount,
+      user,
       createdAt: data.date ?? new Date(),
       updatedAt: data.date ?? new Date(),
     });
@@ -53,13 +57,13 @@ export class TransferService extends BaseService<Transfer> {
     await this.repository.save(transfer);
   }
 
-  async update(id: any, data: any): Promise<UpdateResult> {
+  async update(id: any, data: any, userId: number): Promise<UpdateResult> {
     const [sourceAccount, destinationAccount, existingTransfer] =
       await Promise.all([
         this.accountService.findById(data.sourceAccountId),
         this.accountService.findById(data.destinationAccountId),
         this.repository.findOne({
-          where: { id },
+          where: { id, user: { id: userId } },
           relations: ['sourceAccount', 'destinationAccount'],
         }),
       ]);
@@ -113,6 +117,7 @@ export class TransferService extends BaseService<Transfer> {
   }
 
   async query(
+    userId: number,
     page = 1,
     limit = 10,
     order: 'ASC' | 'DESC' = 'ASC',
@@ -159,6 +164,7 @@ export class TransferService extends BaseService<Transfer> {
     }
 
     const [data, total] = await queryBuilder
+      .andWhere('transfer.userId = :userId', { userId })
       .orderBy('transfer.updatedAt', order)
       .take(limit)
       .skip((page - 1) * limit)

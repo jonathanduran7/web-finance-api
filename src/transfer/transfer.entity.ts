@@ -1,4 +1,5 @@
 import { Account } from 'src/account/account.entity';
+import { User } from 'src/users/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -37,4 +38,8 @@ export class Transfer {
   })
   @JoinColumn({ name: 'destinationAccountId' })
   destinationAccount: Account;
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  user: User;
 }

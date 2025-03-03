@@ -3,6 +3,7 @@ import { BaseController } from 'src/core/base.controller';
 import { Transfer } from './transfer.entity';
 import { TransferDTO } from './transfer.dto';
 import { TransferService } from './transfer.service';
+import { GetCurrentUserId } from 'src/commons/decorators/get-current-user-id.decorator';
 
 enum Order {
   ASC = 'ASC',
@@ -17,6 +18,7 @@ export class TransferController extends BaseController<Transfer, TransferDTO> {
 
   @Get('query')
   query(
+    @GetCurrentUserId() userId: number,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('order', new ParseEnumPipe(Order)) order?: Order,
@@ -26,6 +28,7 @@ export class TransferController extends BaseController<Transfer, TransferDTO> {
     @Query('endDate') endDate?: string,
   ) {
     return this.transferService.query(
+      userId,
       page,
       limit,
       order,
