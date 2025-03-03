@@ -10,6 +10,7 @@ import {
 import { BaseEntity, BaseService } from './base.service';
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
+import { GetCurrentUserId } from 'src/commons/decorators/get-current-user-id.decorator';
 
 export class BaseController<T extends BaseEntity, DTOType extends object> {
   constructor(
@@ -18,7 +19,10 @@ export class BaseController<T extends BaseEntity, DTOType extends object> {
   ) {}
 
   @Get()
-  async getBase() {
+  async getBase(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @GetCurrentUserId() userId: number,
+  ) {
     return this.service.findAll();
   }
 
@@ -28,29 +32,36 @@ export class BaseController<T extends BaseEntity, DTOType extends object> {
   }
 
   @Post()
-  async postBase(@Body() body: DTOType) {
+  async postBase(@Body() body: DTOType, @GetCurrentUserId() userId: number) {
     const dto = plainToInstance(this.DTOClass, body);
     try {
       await validateOrReject(dto);
     } catch (e) {
       throw new BadRequestException(e);
     }
-    return this.service.create(dto);
+    return this.service.create(dto, userId);
   }
 
   @Put(':id')
-  async putBase(@Param('id') id: string, @Body() body: DTOType) {
+  async putBase(
+    @Param('id') id: string,
+    @Body() body: DTOType,
+    @GetCurrentUserId() userId: number,
+  ) {
     const dto = plainToInstance(this.DTOClass, body);
     try {
       await validateOrReject(dto);
     } catch (e) {
       throw new BadRequestException(e);
     }
-    return this.service.update(+id, body);
+    return this.service.update(+id, body, userId);
   }
 
   @Delete(':id')
-  async deleteBase(@Param('id') id: number) {
-    return this.service.delete(+id);
+  async deleteBase(
+    @Param('id') id: number,
+    @GetCurrentUserId() userId: number,
+  ) {
+    return this.service.delete(+id, userId);
   }
 }
