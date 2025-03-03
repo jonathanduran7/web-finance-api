@@ -7,6 +7,7 @@ import { CategoryModule } from './category/category.module';
 import { AccountModule } from './account/account.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { TransferModule } from './transfer/transfer.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TransferModule } from './transfer/transfer.module';
     AccountModule,
     TransactionModule,
     TransferModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
