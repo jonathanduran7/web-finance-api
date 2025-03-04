@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from '../config/database.config';
 import { validationSchema } from '../config/validation.config';
+import * as fs from 'fs';
 
 @Module({
   imports: [
@@ -24,6 +25,12 @@ import { validationSchema } from '../config/validation.config';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
         autoLoadEntities: true,
+        ssl: {
+          rejectUnauthorized: true,
+          ca: fs
+            .readFileSync(configService.get('database.sslCaPath'))
+            .toString(),
+        },
       }),
     }),
   ],
